@@ -1,7 +1,7 @@
 export function NavBar() {
   return (
     <nav id="topnav">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%', padding: '0 2vw' }}>
+      <div className="nav-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <a className="nav-brand" href="#ch0" aria-label="Finova Solutions home">
           <img className="nav-brand-logo" src="/assets/finova-icon.png" alt="Finova Solutions logo" decoding="async" />
           <span className="sr-only">Finova Solutions</span>

@@ -10,9 +10,6 @@ try {
   // Build the Next app
   run('npx next build');
 
-  // Export static HTML to `out`
-  run('npx next export');
-
   const outDir = 'out';
   const distDir = 'dist';
 

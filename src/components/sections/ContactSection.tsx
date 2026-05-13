@@ -39,7 +39,7 @@ export function ContactSection() {
               <div className="contact-details">
                 <div className="c-row">
                   <span>Email</span>
-                  <strong>support@finovasolutions.com</strong>
+                  <strong>info@finovasolutions.tech</strong>
                 </div>
                 <div className="c-row">
                   <span>Support Hours</span>
