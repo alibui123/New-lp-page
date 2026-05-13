@@ -154,7 +154,7 @@
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
   /* ── Resize ── */
-  const DPR = Math.min(window.devicePixelRatio || 1, 1.5); // cap at 1.5× for perf
+  const DPR = Math.min(window.devicePixelRatio || 1, 1.0); // cap at 1× for perf — gradient is subtle
   let W = 0, H = 0;
 
   function resize() {
@@ -171,13 +171,13 @@
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 150);
+    resizeTimer = setTimeout(resize, 250);
   }, { passive: true });
 
   /* ── Render loop ──
-   * Pauses when tab is hidden (visibilitychange).
-   * Runs at ~30 fps by skipping odd frames — gradient moves so
-   * slowly that 30 fps is imperceptible, halving GPU load.
+   * Pauses when tab is hidden.
+   * Runs at ~15 fps by rendering every 4th frame — the gradient
+   * moves so slowly that this is imperceptible, but quarters GPU load.
    */
   let rafId = null;
   let frame = 0;
@@ -191,8 +191,8 @@
   function render(t) {
     if (paused) { rafId = null; return; }
 
-    /* Skip every other frame — gradient is slow-moving */
-    if (++frame % 2 === 0) {
+    /* Render every 4th frame — ~15fps is plenty for a slow gradient */
+    if (++frame % 4 === 0) {
       gl.uniform2f(uRes, W / DPR, H / DPR);
       gl.uniform1f(uTime, t * 0.001);
       gl.drawArrays(gl.TRIANGLES, 0, 6);

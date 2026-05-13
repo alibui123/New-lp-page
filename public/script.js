@@ -45,7 +45,21 @@ function startLoop() {
 }
 startLoop();
 
-/* ─── SCROLL STATE (passive listener — no Lenis overhead) ─── */
+/* ─── LENIS SMOOTH SCROLL ─── */
+let lenis = null;
+if (typeof Lenis !== 'undefined' && !reduceMotion) {
+  lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    touchMultiplier: 1.5,
+  });
+
+  // Wire Lenis into the single rAF loop (no second loop)
+  addTask((t) => { lenis.raf(t); });
+}
+
+/* ─── SCROLL STATE ─── */
 let scrollY = 0;
 let ticking  = false;
 
@@ -71,7 +85,7 @@ function onScrollFrame() {
   nav.classList.toggle('inked', scrollY > 40);
 }
 
-/* ─── CURSOR (CSS transform only, single lerp task) ─── */
+/* ─── CURSOR (CSS transform only, full-rate lerp) ─── */
 const blob = document.getElementById('cursor-blob');
 if (blob && finePointer) {
   let mx = window.innerWidth * 0.5, my = window.innerHeight * 0.5;
@@ -80,56 +94,17 @@ if (blob && finePointer) {
   window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
 
   addTask(() => {
-    bx += (mx - bx) * 0.15;
-    by += (my - by) * 0.15;
-    blob.style.transform = `translate3d(${bx - 16}px,${by - 16}px,0)`;
+    bx += (mx - bx) * 0.18;
+    by += (my - by) * 0.18;
+    blob.style.transform = `translate3d(${bx - 14}px,${by - 14}px,0)`;
   });
 }
 
-/* ─── SOFT AMBIENT SPOTLIGHT (throttled: only updates every 2 frames) ─── */
-const spotlight = document.createElement('div');
-spotlight.setAttribute('aria-hidden', 'true');
-spotlight.style.cssText = `
-  position:fixed;inset:0;pointer-events:none;z-index:1;
-  mix-blend-mode:screen;opacity:.6;will-change:background;
-`;
-document.body.appendChild(spotlight);
+/* ─── SPOTLIGHT REMOVED — was recalculating full-viewport radial-gradient every 2 frames ─── */
 
-let spX = window.innerWidth * 0.5, spY = window.innerHeight * 0.3;
-let spTX = spX, spTY = spY;
-let spFrame = 0;
+/* ─── PARALLAX REMOVED — getBoundingClientRect every frame forces layout thrash ─── */
 
-if (finePointer && !reduceMotion) {
-  window.addEventListener('pointermove', e => { spTX = e.clientX; spTY = e.clientY; }, { passive: true });
-
-  addTask(() => {
-    if (++spFrame % 2 !== 0) return; // half-rate update
-    spX += (spTX - spX) * 0.06;
-    spY += (spTY - spY) * 0.06;
-    spotlight.style.background = `radial-gradient(circle 240px at ${spX}px ${spY}px,rgba(33,210,237,.07),transparent 60%)`;
-  });
-}
-
-/* ─── PARALLAX (passive, coarse — only large sections, half-rate) ─── */
-if (!reduceMotion) {
-  const parallaxEls = [
-    { el: document.querySelector('.ch1-inner'), depth: 0.04 },
-    { el: document.querySelector('#contact .contact-inner'), depth: 0.035 },
-  ].filter(o => o.el);
-
-  let plFrame = 0;
-  function parallaxTask() {
-    if (++plFrame % 2 !== 0) return;
-    for (const { el, depth } of parallaxEls) {
-      const rect = el.getBoundingClientRect();
-      const center = rect.top + rect.height / 2 - window.innerHeight / 2;
-      el.style.transform = `translate3d(0,${center * depth}px,0)`;
-    }
-  }
-  addTask(parallaxTask);
-}
-
-/* ─── HERO PARALLAX (pointer-only, inside ch0) ─── */
+/* ─── HERO PARALLAX (pointer-only, very gentle, quarter-rate) ─── */
 const heroWrap = document.querySelector('.cold-open-wrap');
 if (heroWrap && finePointer && !reduceMotion) {
   let hTX = 0, hTY = 0, hX = 0, hY = 0;
@@ -145,47 +120,14 @@ if (heroWrap && finePointer && !reduceMotion) {
 
   let hFrame = 0;
   addTask(() => {
-    if (!heroVisible || ++hFrame % 2 !== 0) return;
-    hX += (hTX - hX) * 0.04;
-    hY += (hTY - hY) * 0.04;
-    heroWrap.style.transform = `translate3d(${hX * 8}px,${hY * 5}px,0)`;
+    if (!heroVisible || ++hFrame % 4 !== 0) return; // quarter-rate
+    hX += (hTX - hX) * 0.03;
+    hY += (hTY - hY) * 0.03;
+    heroWrap.style.transform = `translate3d(${hX * 4}px,${hY * 3}px,0)`;
   });
 }
 
-/* ─── CARD TILT (pointer — no per-frame work unless hovering) ─── */
-if (finePointer && !reduceMotion) {
-  let activeTilt = null;
-  const STRENGTH = 5;
-
-  document.querySelectorAll('.step-content, .metric-block, .team-card, .result-chip').forEach(card => {
-    card.addEventListener('pointermove', e => { activeTilt = { card, e }; }, { passive: true });
-    card.addEventListener('pointerleave', () => {
-      if (activeTilt && activeTilt.card === card) activeTilt = null;
-      card.style.transform = '';
-    });
-  });
-
-  let tFrame = 0;
-  addTask(() => {
-    if (!activeTilt || ++tFrame % 2 !== 0) return;
-    const { card, e } = activeTilt;
-    const r = card.getBoundingClientRect();
-    const tx = ((e.clientX - r.left) / r.width  - 0.5) * 2;
-    const ty = ((e.clientY - r.top)  / r.height - 0.5) * 2;
-    card.style.transform = `translate3d(${tx * STRENGTH}px,${ty * STRENGTH}px,0) rotateX(${-ty * STRENGTH * 0.5}deg) rotateY(${tx * STRENGTH * 0.5}deg)`;
-  });
-}
-
-/* ─── MAGNETIC BUTTONS ─── */
-document.querySelectorAll('.btn-primary, .btn-ghost').forEach(btn => {
-  btn.addEventListener('mousemove', e => {
-    const r = btn.getBoundingClientRect();
-    const x = (e.clientX - r.left - r.width  / 2) * 0.08;
-    const y = (e.clientY - r.top  - r.height / 2) * 0.08;
-    btn.style.transform = `translate3d(${x}px,${y}px,0)`;
-  });
-  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
-});
+/* ─── CARD TILT & MAGNETIC BUTTONS REMOVED — getBoundingClientRect on every hover frame forces layout ─── */
 
 /* ─── INTERSECTION: FADE REVEALS (single shared observer) ─── */
 const revealObs = new IntersectionObserver(entries => {
