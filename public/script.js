@@ -5,7 +5,7 @@
    2. Passive scroll listener instead of Lenis for parallax
    3. Removed word-by-word splitting (causes layout thrash)
    4. Reduced will-change scope
-   5. Throttled ETA ticker & parallax
+   5. Static contact ETA (no JS ticker) & parallax
    6. Dropped Three.js dependency (unused)
    7. CSS-only cursor (no JS lerp on every frame)
    8. Debounced resize handler
@@ -199,17 +199,7 @@ const callObs = new IntersectionObserver(entries => {
 const callStream = document.getElementById('callStream');
 if (callStream) callObs.observe(callStream);
 
-/* ─── ETA TICKER (setInterval — no rAF needed) ─── */
-if (!reduceMotion) {
-  let eta = 12;
-  const etaEl = document.getElementById('eta-display');
-  if (etaEl) {
-    setInterval(() => {
-      eta = eta > 7 ? eta - 1 : 12;
-      etaEl.textContent = `${eta} min response`;
-    }, 2500);
-  }
-}
+/* ─── ETA (static copy — set in ContactSection markup) ─── */
 
 /* ─── DROPLET CANVAS (hero only, lightweight) ─── */
 const canvas = document.getElementById('dropCanvas');

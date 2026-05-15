@@ -51,7 +51,7 @@ export function ContactSection() {
                 </div>
                 <div className="c-row">
                   <span>Average ETA</span>
-                  <strong id="eta-display">12 min response</strong>
+                  <strong id="eta-display">30 minutes</strong>
                 </div>
               </div>
             </div>

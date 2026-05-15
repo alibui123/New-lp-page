@@ -81,7 +81,7 @@ export function Chapter3() {
               </div>
               <div className="summary-row">
                 <b>ETA</b>
-                <span>12 min</span>
+                <span>30 minutes</span>
               </div>
               <div className="summary-meter">
                 <span></span>
