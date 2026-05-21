@@ -1,14 +1,14 @@
 type NavBarProps = {
-  currentPage?: 'home' | 'offer';
+  currentPage?: 'home' | 'offer' | 'terms';
 };
 
 export function NavBar({ currentPage = 'home' }: NavBarProps) {
-  const prefix = currentPage === 'offer' ? '/' : '';
+  const prefix = currentPage === 'home' ? '' : '/';
 
   return (
     <nav id="topnav">
-      <div className="nav-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <a className="nav-brand" href={currentPage === 'offer' ? '/' : '#ch0'} aria-label="Finova Solutions home">
+      <div className="nav-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingInline: '14px' }}>
+        <a className="nav-brand" href={currentPage === 'home' ? '#ch0' : '/'} aria-label="Finova Solutions home">
           <img className="nav-brand-logo" src="/assets/finova-icon.png" alt="Finova Solutions logo" decoding="async" />
           <span className="sr-only">Finova Solutions</span>
         </a>

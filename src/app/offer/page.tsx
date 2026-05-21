@@ -22,7 +22,12 @@ export default function OfferPage() {
               <span className="op-hero__title-line">Add&nbsp;</span>
               <span className="op-hero__title-accent">$25,000</span>
               <span className="op-hero__title-line">&nbsp;to your monthly revenue</span>
-              <span className="op-hero__title-sub fade-up d2">— or we pay you $3,000 and work free.</span>
+              <span className="op-hero__title-sub fade-up d2">
+                — or we pay you $3,000 and work free.
+                <a className="op-guarantee__tc-link op-hero__tc-inline" href="/terms">
+                  T&amp;C APPLIED
+                </a>
+              </span>
             </h1>
             <p className="op-hero__desc fade-up d3">
               A six-month engagement that installs a predictable, evergreen client-handling
@@ -123,6 +128,9 @@ export default function OfferPage() {
               It takes time to build a proper structure and pipeline — but once it&apos;s done, it&apos;s evergreen.
               This is a 6-month engagement, not a get-rich-quick scheme.
             </p>
+            <a className="op-guarantee__tc-link fade-up d2" href="/terms">
+              T&amp;C APPLIED
+            </a>
           </div>
         </section>
 
@@ -229,6 +237,9 @@ export default function OfferPage() {
                   <li>$3,000 wire transfer to you</li>
                   <li>60 days free continued support</li>
                 </ul>
+                <a className="op-guarantee__tc-link" href="/terms">
+                  T&amp;C APPLIED
+                </a>
               </div>
             </div>
           </div>
