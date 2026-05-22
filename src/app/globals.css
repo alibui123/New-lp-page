@@ -2863,3 +2863,25 @@ button.btn-primary:disabled {
   .op-hero__title-accent { animation: none !important; }
   .op-guarantee__option { transition: none !important; }
 }
+
+/* Mobile: center hero CTAs and give them matching widths so the small
+   "Take a demo" button centers above the larger "See Our Guarantee" button */
+@media (max-width: 640px) {
+  .hero-wave-cta,
+  .hero-offer-cta {
+    display: block;
+    width: min(360px, 86%);
+    margin: 12px auto 0;
+    text-align: center;
+  }
+
+  .hero-wave-cta__inner {
+    justify-content: center;
+  }
+
+  /* ensure the visual pill fills the container so both look aligned */
+  .hero-wave-cta__inner,
+  .hero-offer-cta {
+    box-sizing: border-box;
+  }
+}
